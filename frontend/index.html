@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Recall Trader Dashboard</title>
+  <link rel="stylesheet" href="/styles.css" />
+  
+  <!-- Chart.js + Financial plugin -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial/dist/chartjs-chart-financial.min.js"></script>
+</head>
+<body>
+  <div class="app">
+    <!-- Header -->
+    <header class="topbar">
+      <h1>Recall — Trader Dashboard</h1>
+      <div class="account-short">
+        <span id="accountName">Agent: local-bot</span>
+      </div>
+      <div class="agent-status-wrap">
+        <span id="agentState" class="status-pill">pending</span>
+      </div>
+    </header>
+
+    <!-- Main Grid Layout -->
+    <main class="grid">
+      
+      <!-- Left Column: Portfolio + Chart -->
+      <section class="card">
+        <h2>Ringkasan Portofolio</h2>
+        <div class="portfolio-summary portfolio-grid">
+          <div>Total Saldo: <strong id="totalBalance">—</strong></div>
+          <div>Profit/Loss (24h): <strong id="dailyPnL">—</strong></div>
+          <div>Aset Aktif: <strong id="activeAssets">—</strong></div>
+        </div>
+
+        <div class="chart-wrap">
+          <!-- Bisa switch: line chart / candlestick -->
+          <canvas id="priceChart"></canvas>
+          <canvas id="candlestickChart" style="display:none;"></canvas>
+        </div>
+      </section>
+
+      <!-- Middle Column: Agent + Trading -->
+      <section class="card">
+        <h2>Status Trading Agent</h2>
+        <div class="agent-status">
+          <div id="agentState2" class="status-pill">pending</div>
+          <div>Recent Trades</div>
+          <ul id="recentTrades" class="trades-list"></ul>
+        </div>
+
+        <hr />
+
+        <h3>Manual Trading</h3>
+        <form id="tradeForm" class="trade-form">
+          <label>From Chain (type): <input name="fromChain" placeholder="svm|evm" /></label>
+          <label>From Specific (chain): <input name="fromSpecific" placeholder="eth, bnb, base, mainnet..." /></label>
+          <label>To Chain (type): <input name="toChain" placeholder="svm|evm" /></label>
+          <label>To Specific (chain): <input name="toSpecific" placeholder="eth, bnb, base..." /></label>
+
+          <label>From Token (address/symbol): <input name="fromToken" required/></label>
+          <label>To Token (address/symbol): <input name="toToken" required/></label>
+
+          <label>Amount: <input name="amount" required/></label>
+          <label>Choose: 
+            <select name="side">
+              <option value="buy">Buy</option>
+              <option value="sell">Sell</option>
+            </select>
+          </label>
+          <label>Reason: <input name="reason" placeholder="Why this trade?" required/></label>
+
+          <button type="submit" class="btn">Submit Trade</button>
+        </form>
+      </section>
+
+      <!-- Right Column: Account Performance -->
+      <section class="card">
+        <h2>My Account — Performance Overview</h2>
+        <div class="perf">
+          <div>Total PnL: <strong id="totalPnl">—</strong></div>
+          <div>Win Rate: <strong id="winRate">—</strong></div>
+          <div>Portfolio Value: <strong id="portfolioValue">—</strong></div>
+        </div>
+
+        <hr />
+        <h3>Assets</h3>
+        <ul id="assetList" class="asset-list"></ul>
+      </section>
+
+      <!-- Extra: Recent Trades (Standalone Section) -->
+      <section class="card">
+        <h2>Recent Trades (Extra View)</h2>
+        <ul id="recentTradesExtra" class="trades-list"></ul>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <small>Built with Recall docs & API patterns (sandbox). UI sample — customize to your brand.</small>
+    </footer>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
