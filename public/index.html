@@ -1,0 +1,114 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Recall Agent Trading — Dashboard</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Recall Agent Trading — Dashboard (Local)</h1>
+    </header>
+
+    <section class="forms">
+      <div class="card">
+        <h2>Manual Trade</h2>
+        <form id="tradeForm">
+          <div class="row">
+            <label>From Chain Type</label>
+            <select name="fromChainType">
+              <option value="evm">EVM</option>
+              <option value="svm">SVM</option>
+            </select>
+            <label>From Specific</label>
+            <input name="fromSpecific" placeholder="eth, sol, base, bnb, btc, arbitrum" />
+          </div>
+
+          <div class="row">
+            <label>To Chain Type</label>
+            <select name="toChainType">
+              <option value="evm">EVM</option>
+              <option value="svm">SVM</option>
+            </select>
+            <label>To Specific</label>
+            <input name="toSpecific" placeholder="eth, base, bnb, btc, arbitrum" />
+          </div>
+
+          <div class="row">
+            <label>Action</label>
+            <select name="action">
+              <option value="buy">Buy</option>
+              <option value="sell">Sell</option>
+            </select>
+          </div>
+
+          <div class="row">
+            <label>From Token</label>
+            <input name="fromToken" placeholder="USDC, ETH, BTC..." />
+            <label>To Token</label>
+            <input name="toToken" placeholder="ETH, SOL..." />
+          </div>
+
+          <div class="row">
+            <label>Amount</label>
+            <input name="amount" type="number" step="any" placeholder="e.g. 10.5" />
+            <label>Reason</label>
+            <input name="reason" placeholder="strategy name / note" />
+          </div>
+
+          <div class="actions">
+            <button type="submit">Submit Trade</button>
+          </div>
+        </form>
+        <div id="tradeResult" class="result"></div>
+      </div>
+
+      <div class="card">
+        <h2>Bridge (Simulate)</h2>
+        <form id="bridgeForm">
+          <div class="row">
+            <label>From Specific</label>
+            <input name="fromSpecific" placeholder="eth, bnb, sol..." />
+            <label>To Specific</label>
+            <input name="toSpecific" placeholder="base, arbitrum..." />
+          </div>
+          <div class="row">
+            <label>Token</label>
+            <input name="token" placeholder="USDC" />
+            <label>Amount</label>
+            <input name="amount" type="number" step="any" />
+          </div>
+          <div class="row">
+            <label>Reason</label>
+            <input name="reason" />
+          </div>
+          <div class="actions">
+            <button type="submit">Submit Bridge</button>
+          </div>
+        </form>
+        <div id="bridgeResult" class="result"></div>
+      </div>
+    </section>
+
+    <section class="portfolio card">
+      <h2>Portfolio</h2>
+      <button id="refreshBtn">Refresh Portfolio</button>
+      <table id="portfolioTable">
+        <thead><tr><th>Token</th><th>Balance</th><th>Chain</th><th>Last Updated</th></tr></thead>
+        <tbody></tbody>
+      </table>
+
+      <h3>All Trades</h3>
+      <pre id="allTrades" class="trades"></pre>
+    </section>
+
+    <footer>
+      <small>Local demo — simulated execution. Integrate with Recall APIs for real trading/competitions. (Docs: recall network)</small>
+    </footer>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

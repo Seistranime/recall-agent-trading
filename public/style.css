@@ -1,0 +1,19 @@
+/* style.css - simple clean UI */
+:root { font-family: Inter, system-ui, Arial; color: #111827; background:#f6f8fa }
+* { box-sizing: border-box }
+.container { max-width: 1100px; margin: 24px auto; padding: 12px; }
+header h1 { margin: 0 0 12px; font-size: 20px; }
+.forms { display:flex; gap:12px; flex-wrap:wrap; }
+.card { background: #fff; padding:12px; border-radius:10px; box-shadow: 0 4px 12px rgba(15,23,42,0.06); flex:1 1 420px; }
+.row { display:flex; gap:8px; margin-bottom:8px; flex-wrap:wrap; align-items:center; }
+label { min-width:110px; font-size:13px; color:#374151 }
+input, select { flex:1; padding:8px 10px; border-radius:8px; border:1px solid #e5e7eb; }
+.actions { margin-top:8px; }
+button { padding:8px 14px; border-radius:8px; background:#0ea5a0; color:white; border:none; cursor:pointer; }
+button:hover { filter:brightness(0.95) }
+.portfolio { margin-top:16px; }
+table { width:100%; border-collapse:collapse; margin-top:8px; background: #fff; }
+th, td { padding:8px 12px; text-align:left; border-bottom:1px solid #eef2f7; font-size:13px; }
+.result { margin-top:8px; font-size:13px; color:#065f46 }
+.trades { max-height:220px; overflow:auto; background:#0f172a;color:#e6eef8;padding:12px;border-radius:8px }
+footer { margin-top:16px; color:#6b7280; font-size:12px }
