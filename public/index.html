@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="id">
 <head>
@@ -13,12 +12,11 @@
       <h1>Recall Agent Trading — Dashboard</h1>
     </header>
 
-    <!-- Bagian Manual Trade (Local + Recall Competition) -->
+    <!-- Bagian Manual Trade -->
     <section class="forms">
       <div class="card">
         <h2>Manual Trade</h2>
         <form id="tradeForm">
-      
           <div class="row">
             <label>From Chain Type</label>
             <select name="fromChainType">
@@ -63,6 +61,54 @@
         <div id="tradeResult" class="result"></div>
         <pre id="tradeOutput" class="trades"></pre>
       </div>
+    </section>
+
+    <!-- Bagian Trade Form Sederhana (From Asset / To Chain / To Asset) -->
+    <section class="forms">
+      <div class="card">
+        <h2>Quick Trade</h2>
+        <form id="quickTradeForm">
+          <label>From Asset:
+            <select name="fromAsset">
+              <option>ETH</option>
+              <option>BTC</option>
+              <option>BNB</option>
+              <option>ARB</option>
+              <option>SOL</option>
+            </select>
+          </label>
+          <label>To Chain:
+            <select name="toChain">
+              <option value="evm">EVM</option>
+              <option value="svm">SVM</option>
+            </select>
+          </label>
+          <label>To Asset:
+            <select name="toAsset">
+              <option>ETH</option>
+              <option>BTC</option>
+              <option>BNB</option>
+              <option>ARB</option>
+              <option>SOL</option>
+            </select>
+          </label>
+          <label>Action:
+            <select name="action">
+              <option value="buy">Buy</option>
+              <option value="sell">Sell</option>
+            </select>
+          </label>
+          <label>Amount:
+            <input type="number" step="0.01" name="amount" placeholder="0.00" required />
+          </label>
+          <button type="submit" class="btn">Submit Trade</button>
+        </form>
+      </div>
+
+      <section class="card">
+        <h2>Transaction Result</h2>
+        <div id="trade-result" class="result-box">Belum ada transaksi.</div>
+      </section>
     </section>
 
     <!-- Bagian Bridge -->
@@ -184,6 +230,17 @@
 
   <script src="app.js"></script>
   <script>
+    // === Quick Trade Form ===
+    const quickForm = document.getElementById("quickTradeForm");
+    const quickResult = document.getElementById("trade-result");
+
+    quickForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const formData = new FormData(quickForm);
+      const payload = Object.fromEntries(formData.entries());
+      quickResult.textContent = `Trade Submitted: ${JSON.stringify(payload)}`;
+    });
+
     // === Transaksi Sederhana (riwayat lokal) ===
     const form = document.getElementById("txForm");
     const resultDiv = document.getElementById("result");
@@ -261,7 +318,7 @@
         row.innerHTML = `
           <td>${data.id || "-"}</td>
           <td>${new Date().toLocaleString()}</td>
-          <td>${payload.competitionId}</td>
+          <td>${payload.competitionId || "-"}</td>
           <td>${payload.fromSpecific} → ${payload.toSpecific}</td>
           <td>${payload.fromToken}/${payload.toToken}</td>
           <td>${payload.amount}</td>
@@ -269,7 +326,6 @@
           <td>${data.success ? "✅ success" : "❌ failed"}</td>
         `;
         historyTable.appendChild(row);
-
       } catch (err) {
         tradeOutput.textContent = "Error: " + err.message;
       }
@@ -277,3 +333,4 @@
   </script>
 </body>
 </html>
+

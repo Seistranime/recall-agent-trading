@@ -2,7 +2,7 @@
 // -------------------------
 // File: src/App.js
 // -------------------------
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 
 const API_BASE = ""; // kosong = backend sama domain, contoh: http://localhost:5000
 
@@ -10,6 +10,10 @@ function App() {
   const [portfolio, setPortfolio] = useState([]);
   const [trades, setTrades] = useState([]);
   const [msg, setMsg] = useState("");
+
+  // -------------------------
+  // Form States
+  // -------------------------
   const [tradeForm, setTradeForm] = useState({
     fromChainType: "evm",
     fromSpecific: "",
@@ -21,6 +25,7 @@ function App() {
     amount: "",
     reason: "",
   });
+
   const [bridgeForm, setBridgeForm] = useState({
     fromSpecific: "",
     toSpecific: "",
@@ -133,21 +138,50 @@ function App() {
   };
 
   // -------------------------
-  // Manual Trade with Recall API
+  // Manual Trade (vanilla style, dipindah ke React)
   // -------------------------
-  const submitManualTrade = async (formData) => {
-    const resp = await fetch(`${API_BASE}/manual-trade`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
-    return resp.json();
-  };
+  const manualFormRef = useRef(null);
+  const manualResultRef = useRef(null);
 
-  const fetchHistory = async () => {
-    const resp = await fetch(`${API_BASE}/manual-trades`);
-    return resp.json();
-  };
+  useEffect(() => {
+    const form = manualFormRef.current;
+    const resultBox = manualResultRef.current;
+
+    if (!form) return;
+
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+
+      resultBox.textContent = "Memproses transaksi...";
+      resultBox.style.color = "black";
+
+      try {
+        const res = await fetch("/api/manual-trade", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        const json = await res.json();
+
+        if (json.error) {
+          resultBox.textContent = "Error: " + json.error;
+          resultBox.style.color = "red";
+        } else {
+          resultBox.textContent =
+            "Transaksi berhasil: " + JSON.stringify(json);
+          resultBox.style.color = "green";
+        }
+      } catch (err) {
+        resultBox.textContent = "Gagal melakukan transaksi.";
+        resultBox.style.color = "red";
+      }
+    };
+
+    form.addEventListener("submit", handleSubmit);
+    return () => form.removeEventListener("submit", handleSubmit);
+  }, []);
 
   // -------------------------
   // UI
@@ -160,7 +194,7 @@ function App() {
 
       {/* Trade Form */}
       <div className="bg-white shadow rounded p-4">
-        <h2 className="text-lg font-semibold mb-2">Manual Trade</h2>
+        <h2 className="text-lg font-semibold mb-2">Manual Trade (React)</h2>
         <form onSubmit={submitTrade} className="grid gap-2">
           <div className="grid grid-cols-2 gap-2">
             <input
@@ -333,6 +367,20 @@ function App() {
         <pre className="bg-gray-100 p-2 rounded text-sm overflow-x-auto max-h-64">
           {JSON.stringify(trades, null, 2)}
         </pre>
+      </div>
+
+      {/* Manual Trade (Vanilla style form) */}
+      <div className="bg-white shadow rounded p-4">
+        <h2 className="text-lg font-semibold mb-2">Manual Trade (Vanilla JS)</h2>
+        <form ref={manualFormRef} id="trade-form" className="grid gap-2">
+          <input name="from" placeholder="From Token" className="border p-2 rounded" />
+          <input name="to" placeholder="To Token" className="border p-2 rounded" />
+          <input name="amount" placeholder="Amount" className="border p-2 rounded" />
+          <button type="submit" className="bg-purple-500 text-white px-4 py-2 rounded">
+            Submit Manual Trade
+          </button>
+        </form>
+        <div ref={manualResultRef} id="trade-result" className="mt-2 text-sm"></div>
       </div>
     </div>
   );
