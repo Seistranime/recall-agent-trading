@@ -385,6 +385,27 @@ function App() {
     </div>
   );
 }
+// Submit trade form
+document.getElementById('tradeForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const compId = document.getElementById('compId').value;
+  const asset = document.getElementById('asset').value;
+  const tradeType = document.getElementById('tradeType').value;
+  const amount = document.getElementById('amount').value;
+
+  try {
+    const res = await fetch('/api/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ competitionId: compId, asset, tradeType, amount })
+    });
+    const data = await res.json();
+    document.getElementById('tradeResult').innerHTML =
+      '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+  } catch (err) {
+    document.getElementById('tradeResult').textContent = 'Error: ' + err.message;
+  }
+});
 
 export default App;
 
