@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html lang="id">
 <head>
   <meta charset="utf-8" />
   <title>Recall Agent Trading — Dashboard</title>
@@ -9,9 +9,10 @@
 <body>
   <div class="container">
     <header>
-      <h1>Recall Agent Trading — Dashboard (Local)</h1>
+      <h1>Recall Agent Trading — Dashboard</h1>
     </header>
 
+    <!-- Bagian Manual Trade -->
     <section class="forms">
       <div class="card">
         <h2>Manual Trade</h2>
@@ -63,8 +64,10 @@
           </div>
         </form>
         <div id="tradeResult" class="result"></div>
+        <pre id="tradeOutput" class="trades"></pre>
       </div>
 
+      <!-- Bagian Bridge -->
       <div class="card">
         <h2>Bridge (Simulate)</h2>
         <form id="bridgeForm">
@@ -92,6 +95,37 @@
       </div>
     </section>
 
+    <!-- Bagian Transaksi Sederhana -->
+    <section class="forms">
+      <div class="card">
+        <h2>Transaksi Sederhana</h2>
+        <form id="txForm">
+          <label>
+            Aset:
+            <input type="text" id="asset" required />
+          </label>
+          <label>
+            Jumlah:
+            <input type="number" id="quantity" step="0.01" required />
+          </label>
+          <label>
+            Harga:
+            <input type="number" id="price" step="0.01" required />
+          </label>
+          <label>
+            Aksi:
+            <select id="action" required>
+              <option value="buy">Buy</option>
+              <option value="sell">Sell</option>
+            </select>
+          </label>
+          <button type="submit">Submit Transaksi</button>
+        </form>
+        <div id="result"></div>
+      </div>
+    </section>
+
+    <!-- Bagian Portfolio + Riwayat -->
     <section class="portfolio card">
       <h2>Portfolio</h2>
       <button id="refreshBtn">Refresh Portfolio</button>
@@ -102,13 +136,113 @@
 
       <h3>All Trades</h3>
       <pre id="allTrades" class="trades"></pre>
+
+      <h3>Riwayat Transaksi</h3>
+      <table id="txTable">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Aset</th>
+            <th>Jumlah</th>
+            <th>Harga</th>
+            <th>Aksi</th>
+            <th>Total</th>
+            <th>Waktu</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
     </section>
 
     <footer>
-      <small>Local demo — simulated execution. Integrate with Recall APIs for real trading/competitions. (Docs: recall network)</small>
+      <small>
+        Local demo — simulated execution. Integrate with Recall APIs for real trading/competitions.
+      </small>
     </footer>
   </div>
 
   <script src="/app.js"></script>
+  <script>
+    // Script transaksi sederhana (riwayat)
+    const form = document.getElementById("txForm");
+    const resultDiv = document.getElementById("result");
+    const txTableBody = document.querySelector("#txTable tbody");
+
+    async function loadTransactions() {
+      const res = await fetch("/api/transactions");
+      const data = await res.json();
+      txTableBody.innerHTML = "";
+      data.transactions.forEach(tx => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${tx.id}</td>
+          <td>${tx.asset}</td>
+          <td>${tx.quantity}</td>
+          <td>${tx.price}</td>
+          <td>${tx.action}</td>
+          <td>${tx.total}</td>
+          <td>${new Date(tx.timestamp).toLocaleString()}</td>
+        `;
+        txTableBody.appendChild(row);
+      });
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      resultDiv.innerHTML = "Mengirim transaksi...";
+
+      const payload = {
+        asset: document.getElementById("asset").value,
+        quantity: parseFloat(document.getElementById("quantity").value),
+        price: parseFloat(document.getElementById("price").value),
+        action: document.getElementById("action").value
+      };
+
+      try {
+        const res = await fetch("/api/transaction", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          resultDiv.innerHTML = `✅ Transaksi berhasil!`;
+          loadTransactions();
+        } else {
+          resultDiv.innerHTML = `❌ Gagal: ${data.error}`;
+        }
+      } catch (err) {
+        console.error(err);
+        resultDiv.innerHTML = `❌ Error: ${err.message}`;
+      }
+    });
+
+    // Load transaksi saat pertama kali dibuka
+    loadTransactions();
+
+    // Script tambahan untuk manual-trade sederhana (versi kedua)
+    const tradeForm = document.getElementById("tradeForm");
+    const tradeOutput = document.getElementById("tradeOutput");
+
+    tradeForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData(tradeForm);
+      const payload = Object.fromEntries(formData.entries());
+
+      try {
+        const res = await fetch("/manual-trade", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        tradeOutput.textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        tradeOutput.textContent = "Error: " + err.message;
+      }
+    });
+  </script>
 </body>
 </html>
+
