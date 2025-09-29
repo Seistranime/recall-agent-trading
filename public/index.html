@@ -1,255 +1,206 @@
 <!doctype html>
+
 <html lang="id">
 <head>
   <meta charset="utf-8" />
   <title>Recall Agent Trading — Dashboard</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>Recall Agent Trading — Dashboard</h1>
-    </header>
+  <!-- Navbar -->
+  <header class="navbar">
+    <h1>Recall Agent Trading</h1>
+    <button id="toggle-dark" class="btn">🌙 Dark Mode</button>
+  </header>
 
-    <!-- Bagian Manual Trade -->
-    <section class="forms">
-      <div class="card">
-        <h2>Manual Trade</h2>
-        <form id="tradeForm">
-          <div class="row">
-            <label>From Chain Type</label>
-            <select name="fromChainType">
-              <option value="evm">EVM</option>
-              <option value="svm">SVM</option>
-            </select>
-            <label>From Specific</label>
-            <input name="fromSpecific" placeholder="eth, sol, base, bnb, btc, arbitrum" />
-          </div>
-          <div class="row">
-            <label>To Chain Type</label>
-            <select name="toChainType">
-              <option value="evm">EVM</option>
-              <option value="svm">SVM</option>
-            </select>
-            <label>To Specific</label>
-            <input name="toSpecific" placeholder="eth, base, bnb, btc, arbitrum" />
-          </div>
-          <div class="row">
-            <label>Action</label>
-            <select name="action">
-              <option value="buy">Buy</option>
-              <option value="sell">Sell</option>
-            </select>
-          </div>
-          <div class="row">
-            <label>From Token</label>
-            <input name="fromToken" placeholder="USDC, ETH, BTC..." />
-            <label>To Token</label>
-            <input name="toToken" placeholder="ETH, SOL..." />
-          </div>
-          <div class="row">
-            <label>Amount</label>
-            <input name="amount" type="number" step="any" placeholder="e.g. 10.5" required />
-            <label>Reason</label>
-            <input name="reason" placeholder="strategy name / note" />
-          </div>
-          <div class="actions">
-            <button type="submit">Submit Trade</button>
-          </div>
-        </form>
-        <div id="tradeResult" class="result"></div>
-        <pre id="tradeOutput" class="trades"></pre>
-      </div>
-    </section>
-
-    <!-- Bagian Trade Form Sederhana (From Asset / To Chain / To Asset) -->
-    <section class="forms">
-      <div class="card">
-        <h2>Quick Trade</h2>
-        <form id="quickTradeForm">
-          <label>From Asset:
-            <select name="fromAsset">
-              <option>ETH</option>
-              <option>BTC</option>
-              <option>BNB</option>
-              <option>ARB</option>
-              <option>SOL</option>
-            </select>
-          </label>
-          <label>To Chain:
-            <select name="toChain">
-              <option value="evm">EVM</option>
-              <option value="svm">SVM</option>
-            </select>
-          </label>
-          <label>To Asset:
-            <select name="toAsset">
-              <option>ETH</option>
-              <option>BTC</option>
-              <option>BNB</option>
-              <option>ARB</option>
-              <option>SOL</option>
-            </select>
-          </label>
-          <label>Action:
-            <select name="action">
-              <option value="buy">Buy</option>
-              <option value="sell">Sell</option>
-            </select>
-          </label>
-          <label>Amount:
-            <input type="number" step="0.01" name="amount" placeholder="0.00" required />
-          </label>
-          <button type="submit" class="btn">Submit Trade</button>
-        </form>
-      </div>
-
-      <section class="card">
-        <h2>Transaction Result</h2>
-        <div id="trade-result" class="result-box">Belum ada transaksi.</div>
-      </section>
-    </section>
-
-    <!-- Bagian Bridge -->
-    <section class="forms">
-      <div class="card">
-        <h2>Bridge (Simulate)</h2>
-        <form id="bridgeForm">
-          <div class="row">
-            <label>From Specific</label>
-            <input name="fromSpecific" placeholder="eth, bnb, sol..." />
-            <label>To Specific</label>
-            <input name="toSpecific" placeholder="base, arbitrum..." />
-          </div>
-          <div class="row">
-            <label>Token</label>
-            <input name="token" placeholder="USDC" />
-            <label>Amount</label>
-            <input name="amount" type="number" step="any" />
-          </div>
-          <div class="row">
-            <label>Reason</label>
-            <input name="reason" />
-          </div>
-          <div class="actions">
-            <button type="submit">Submit Bridge</button>
-          </div>
-        </form>
-        <div id="bridgeResult" class="result"></div>
-      </div>
-    </section>
-
-    <!-- Bagian Transaksi Sederhana -->
-    <section class="forms">
-      <div class="card">
-        <h2>Transaksi Sederhana</h2>
-        <form id="txForm">
-          <label>
-            Aset:
-            <input type="text" id="asset" required />
-          </label>
-          <label>
-            Jumlah:
-            <input type="number" id="quantity" step="0.01" required />
-          </label>
-          <label>
-            Harga:
-            <input type="number" id="price" step="0.01" required />
-          </label>
-          <label>
-            Aksi:
-            <select id="action" required>
-              <option value="buy">Buy</option>
-              <option value="sell">Sell</option>
-            </select>
-          </label>
-          <button type="submit">Submit Transaksi</button>
-        </form>
-        <div id="result"></div>
-      </div>
-    </section>
-
-    <!-- Bagian Portfolio + Riwayat -->
-    <section class="portfolio card">
-      <h2>Portfolio</h2>
-      <button id="refreshBtn">Refresh Portfolio</button>
-      <table id="portfolioTable">
-        <thead>
-          <tr><th>Token</th><th>Balance</th><th>Chain</th><th>Last Updated</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-
-      <h3>All Trades</h3>
-      <pre id="allTrades" class="trades"></pre>
-
-      <h3>Riwayat Transaksi</h3>
-      <table id="txTable">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Aset</th>
-            <th>Jumlah</th>
-            <th>Harga</th>
-            <th>Aksi</th>
-            <th>Total</th>
-            <th>Waktu</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </section>
-
-    <!-- Bagian Trade History Recall -->
+  <main class="container">
+    <!-- Manual Trade -->
     <section class="card">
-      <h2>Trade History (Recall Competition)</h2>
-      <table id="history-table" border="1">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Timestamp</th>
-            <th>Competition</th>
-            <th>From → To</th>
-            <th>Token</th>
-            <th>Amount</th>
-            <th>Action</th>
-            <th>Status / Result</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+      <h2>Manual Trade</h2>
+      <form id="manual-trade-form" class="form-grid">
+        <label>From Chain
+          <select name="fromChain">
+            <option value="EVM">EVM</option>
+            <option value="SVM">SVM</option>
+          </select>
+        </label>
+        <label>From Specific
+          <input type="text" name="fromSpecific" placeholder="eth, sol, bnb..." />
+        </label>
+        <label>To Chain
+          <select name="toChain">
+            <option value="EVM">EVM</option>
+            <option value="SVM">SVM</option>
+          </select>
+        </label>
+        <label>To Specific
+          <input type="text" name="toSpecific" placeholder="eth, base, arb..." />
+        </label>
+        <label>Action
+          <select name="action">
+            <option value="buy">Buy</option>
+            <option value="sell">Sell</option>
+          </select>
+        </label>
+        <label>From Token
+          <input type="text" name="fromToken" placeholder="USDC, ETH..." />
+        </label>
+        <label>To Token
+          <input type="text" name="toToken" placeholder="ETH, SOL..." />
+        </label>
+        <label>Amount
+          <input type="number" step="0.01" name="amount" placeholder="10.5" required />
+        </label>
+        <label>Reason
+          <input type="text" name="reason" placeholder="strategy / note" />
+        </label>
+        <button type="submit" class="btn primary">Submit Trade</button>
+      </form>
+      <pre id="manual-trade-output" class="trades"></pre>
     </section>
 
-    <footer>
-      <small>
-        Local demo — simulated execution. Integrate with Recall APIs for real trading/competitions.
-      </small>
-    </footer>
-  </div>
+```
+<!-- Quick Trade -->
+<section class="card">
+  <h2>Quick Trade</h2>
+  <form id="quick-trade-form" class="form-grid">
+    <label>From
+      <select name="fromAsset">
+        <option>ETH</option><option>BTC</option><option>BNB</option><option>ARB</option><option>SOL</option>
+      </select>
+    </label>
+    <label>To
+      <select name="toAsset">
+        <option>ETH</option><option>BTC</option><option>BNB</option><option>ARB</option><option>SOL</option>
+      </select>
+    </label>
+    <label>Action
+      <select name="action">
+        <option value="buy">Buy</option><option value="sell">Sell</option>
+      </select>
+    </label>
+    <label>Amount
+      <input type="number" step="0.01" name="amount" required />
+    </label>
+    <button type="submit" class="btn primary">Submit</button>
+  </form>
+  <div id="quick-trade-result" class="result-box">Belum ada transaksi.</div>
+</section>
+
+<!-- Bridge -->
+<section class="card">
+  <h2>Bridge (Simulate)</h2>
+  <form id="bridge-form" class="form-grid">
+    <label>From
+      <input type="text" name="fromBridge" placeholder="eth, sol..." />
+    </label>
+    <label>To
+      <input type="text" name="toBridge" placeholder="base, arb..." />
+    </label>
+    <label>Token
+      <input type="text" name="token" placeholder="USDC" />
+    </label>
+    <label>Amount
+      <input type="number" name="amount" step="0.01" />
+    </label>
+    <label>Reason
+      <input type="text" name="reason" />
+    </label>
+    <button type="submit" class="btn primary">Submit</button>
+  </form>
+  <div id="bridge-result" class="result-box"></div>
+</section>
+
+<!-- Transaksi Sederhana -->
+<section class="card">
+  <h2>Transaksi Sederhana</h2>
+  <form id="tx-form" class="form-grid">
+    <label>Aset <input type="text" id="asset" required /></label>
+    <label>Jumlah <input type="number" id="quantity" step="0.01" required /></label>
+    <label>Harga <input type="number" id="price" step="0.01" required /></label>
+    <label>Aksi
+      <select id="action" required>
+        <option value="buy">Buy</option><option value="sell">Sell</option>
+      </select>
+    </label>
+    <button type="submit" class="btn primary">Submit Transaksi</button>
+  </form>
+  <div id="tx-result"></div>
+</section>
+
+<!-- Portfolio -->
+<section class="card">
+  <h2>Portfolio</h2>
+  <button id="refresh-portfolio" class="btn">Refresh Portfolio</button>
+  <table id="portfolio-table">
+    <thead>
+      <tr><th>Token</th><th>Balance</th><th>Chain</th><th>Last Updated</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</section>
+
+<!-- Riwayat Transaksi -->
+<section class="card">
+  <h2>Riwayat Transaksi</h2>
+  <table>
+    <thead>
+      <tr><th>ID</th><th>Asset</th><th>Jumlah</th><th>Harga</th><th>Aksi</th><th>Total</th><th>Waktu</th></tr>
+    </thead>
+    <tbody id="riwayat-body"></tbody>
+  </table>
+</section>
+
+<!-- Trade History Recall -->
+<section class="card">
+  <h2>Trade History (Recall Competition)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th><th>Timestamp</th><th>Competition</th>
+        <th>From → To</th><th>Token</th><th>Amount</th><th>Action</th><th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="history-body"></tbody>
+  </table>
+</section>
+```
+
+  </main>
+
+  <footer>
+    <small>Local demo — simulated execution. Integrate with Recall APIs for real trading/competitions.</small>
+  </footer>
 
   <script src="app.js"></script>
-  <script>
-    // === Quick Trade Form ===
-    const quickForm = document.getElementById("quickTradeForm");
-    const quickResult = document.getElementById("trade-result");
 
-    quickForm.addEventListener("submit", (e) => {
+  <script>
+    // Dark Mode Toggle
+    const darkToggle = document.getElementById("toggle-dark");
+    darkToggle.addEventListener("click", () => {
+      document.body.classList.toggle("dark");
+      darkToggle.textContent = document.body.classList.contains("dark") ? "☀️ Light Mode" : "🌙 Dark Mode";
+    });
+
+    // Quick Trade
+    const quickForm = document.getElementById("quick-trade-form");
+    const quickResult = document.getElementById("quick-trade-result");
+    quickForm.addEventListener("submit", e => {
       e.preventDefault();
-      const formData = new FormData(quickForm);
-      const payload = Object.fromEntries(formData.entries());
+      const payload = Object.fromEntries(new FormData(quickForm).entries());
       quickResult.textContent = `Trade Submitted: ${JSON.stringify(payload)}`;
     });
 
-    // === Transaksi Sederhana (riwayat lokal) ===
-    const form = document.getElementById("txForm");
-    const resultDiv = document.getElementById("result");
-    const txTableBody = document.querySelector("#txTable tbody");
+    // Transaksi Sederhana
+    const txForm = document.getElementById("tx-form");
+    const txResult = document.getElementById("tx-result");
+    const riwayatBody = document.getElementById("riwayat-body");
 
     async function loadTransactions() {
       const res = await fetch("/api/transactions");
       const data = await res.json();
-      txTableBody.innerHTML = "";
+      riwayatBody.innerHTML = "";
       data.transactions.forEach(tx => {
         const row = document.createElement("tr");
         row.innerHTML = `
@@ -261,13 +212,13 @@
           <td>${tx.total}</td>
           <td>${new Date(tx.timestamp).toLocaleString()}</td>
         `;
-        txTableBody.appendChild(row);
+        riwayatBody.appendChild(row);
       });
     }
 
-    form.addEventListener("submit", async (e) => {
+    txForm.addEventListener("submit", async e => {
       e.preventDefault();
-      resultDiv.innerHTML = "Mengirim transaksi...";
+      txResult.textContent = "Mengirim transaksi...";
       const payload = {
         asset: document.getElementById("asset").value,
         quantity: parseFloat(document.getElementById("quantity").value),
@@ -276,44 +227,37 @@
       };
       try {
         const res = await fetch("/api/transaction", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+          method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
         });
         const data = await res.json();
         if (data.success) {
-          resultDiv.innerHTML = `✅ Transaksi berhasil!`;
+          txResult.textContent = "✅ Transaksi berhasil!";
           loadTransactions();
         } else {
-          resultDiv.innerHTML = `❌ Gagal: ${data.error}`;
+          txResult.textContent = `❌ Gagal: ${data.error}`;
         }
       } catch (err) {
-        console.error(err);
-        resultDiv.innerHTML = `❌ Error: ${err.message}`;
+        txResult.textContent = `❌ Error: ${err.message}`;
       }
     });
-
     loadTransactions();
 
-    // === Manual Trade (Recall API / lokal) ===
-    const tradeForm = document.getElementById("tradeForm");
-    const tradeOutput = document.getElementById("tradeOutput");
-
-    tradeForm.addEventListener("submit", async (e) => {
+    // Manual Trade
+    const manualForm = document.getElementById("manual-trade-form");
+    const manualOutput = document.getElementById("manual-trade-output");
+    manualForm.addEventListener("submit", async e => {
       e.preventDefault();
-      const formData = new FormData(tradeForm);
-      const payload = Object.fromEntries(formData.entries());
+      const payload = Object.fromEntries(new FormData(manualForm).entries());
       try {
         const res = await fetch("/manual-trade", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+          method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
         });
         const data = await res.json();
-        tradeOutput.textContent = JSON.stringify(data, null, 2);
+        manualOutput.textContent = JSON.stringify(data, null, 2);
 
-        // update Recall competition history table
-        const historyTable = document.querySelector("#history-table tbody");
+        const historyBody = document.getElementById("history-body");
         const row = document.createElement("tr");
         row.innerHTML = `
           <td>${data.id || "-"}</td>
@@ -325,12 +269,12 @@
           <td>${payload.action}</td>
           <td>${data.success ? "✅ success" : "❌ failed"}</td>
         `;
-        historyTable.appendChild(row);
+        historyBody.appendChild(row);
       } catch (err) {
-        tradeOutput.textContent = "Error: " + err.message;
+        manualOutput.textContent = "Error: " + err.message;
       }
     });
   </script>
+
 </body>
 </html>
-
