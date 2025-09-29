@@ -1,280 +1,250 @@
 <!doctype html>
-
 <html lang="id">
 <head>
   <meta charset="utf-8" />
-  <title>Recall Agent Trading — Dashboard</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link rel="stylesheet" href="style.css" />
+  <title>Mockup — Dashboard Agent Trading</title>
+  <style>
+    :root{--bg:#0f1724;--card:#0b1220;--muted:#94a3b8;--accent:#06b6d4;--glass:rgba(255,255,255,0.03)}
+    *{box-sizing:border-box;font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial}
+    body{margin:0;background:linear-gradient(180deg,#071029 0%, #071828 100%);color:#e6eef6}
+    .app{display:grid;grid-template-columns:260px 1fr;gap:20px;min-height:100vh;padding:24px}
+    .sidebar{background:var(--card);border-radius:12px;padding:18px;box-shadow:0 6px 18px rgba(2,6,23,0.6)}
+    .brand{font-weight:700;font-size:18px;display:flex;align-items:center;gap:10px}
+    .nav{margin-top:18px;display:flex;flex-direction:column;gap:8px}
+    .nav button{background:transparent;border:none;color:var(--muted);padding:10px;border-radius:8px;text-align:left;cursor:pointer}
+    .nav button.active{background:var(--glass);color:#fff}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:16px;border-radius:12px}
+
+    header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    header h1{margin:0;font-size:18px}
+    .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .grid-2{display:grid;grid-template-columns:1fr 420px;gap:12px}
+
+    /* Manual trade form */
+    .form-row{display:flex;gap:8px;margin-bottom:8px}
+    select,input{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px;border-radius:8px;color:inherit;width:100%}
+    .btn{background:var(--accent);border:none;padding:10px 14px;border-radius:10px;color:#022;cursor:pointer;font-weight:600}
+    .btn.secondary{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
+
+    /* Portfolio */
+    .portfolio-item{display:flex;justify-content:space-between;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.02);margin-bottom:8px}
+
+    /* Table */
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03);font-size:13px}
+    th{color:var(--muted);font-weight:600}
+
+    /* Agent controls */
+    .agent-status{display:flex;align-items:center;gap:10px}
+    .dot{width:10px;height:10px;border-radius:50%}
+    .dot.green{background:#10b981}
+    .dot.gray{background:#64748b}
+    .log{height:120px;overflow:auto;background:rgba(0,0,0,0.12);padding:8px;border-radius:8px;font-size:13px}
+
+    /* Responsive */
+    @media (max-width:980px){.app{grid-template-columns:1fr;padding:12px}.grid-2{grid-template-columns:1fr}.grid-3{grid-template-columns:1fr}}
+  </style>
 </head>
 <body>
-  <!-- Navbar -->
-  <header class="navbar">
-    <h1>Recall Agent Trading</h1>
-    <button id="toggle-dark" class="btn">🌙 Dark Mode</button>
-  </header>
+  <div class="app">
+    <aside class="sidebar card">
+      <div class="brand">🔁 Recall Trader</div>
+      <div style="margin-top:12px;color:var(--muted);font-size:13px">Connected: <strong id="walletLabel">Not connected</strong></div>
+      <nav class="nav">
+        <button class="active" data-view="dashboard">Dashboard</button>
+        <button data-view="trade">Manual Trade</button>
+        <button data-view="portfolio">Portfolio</button>
+        <button data-view="history">Trade History</button>
+        <button data-view="settings">Settings</button>
+      </nav>
+      <div style="margin-top:18px;font-size:13px;color:var(--muted)">Agent</div>
+      <div style="margin-top:8px;display:flex;gap:8px">
+        <button class="btn" id="connectBtn">Connect Wallet</button>
+        <button class="btn secondary" id="simWallet">Sim</button>
+      </div>
+    </aside>
 
-  <main class="container">
-    <!-- Manual Trade -->
-    <section class="card">
+    <main>
+      <div class="card">
+        <header>
+          <h1>Dashboard — Agent Trading Mockup</h1>
+          <div style="display:flex;gap:12px;align-items:center">
+            <div style="text-align:right;color:var(--muted);font-size:13px">Total Equity
+              <div style="font-weight:700;font-size:16px">$<span id="totalEquity">12,480</span></div>
+            </div>
+            <div style="width:44px;height:44px;background:rgba(255,255,255,0.03);border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--muted)">⚙️</div>
+          </div>
+        </header>
+
+         <section class="trade-form">
       <h2>Manual Trade</h2>
-      <form id="manual-trade-form" class="form-grid">
-        <label>From Chain
-          <select name="fromChain">
-            <option value="EVM">EVM</option>
-            <option value="SVM">SVM</option>
+      <form id="tradeForm">
+        <label>From Chain:
+          <select id="fromChain">
+            <option value="svm">SVM</option>
+            <option value="evm">EVM</option>
           </select>
         </label>
-        <label>From Specific
-          <input type="text" name="fromSpecific" placeholder="eth, sol, bnb..." />
-        </label>
-        <label>To Chain
-          <select name="toChain">
-            <option value="EVM">EVM</option>
-            <option value="SVM">SVM</option>
+        <label>From Specific:
+          <select id="fromSpecific">
+            <option value="eth">ETH</option>
+            <option value="base">BASE</option>
+            <option value="bnb">BNB</option>
+            <option value="btc">BTC</option>
+            <option value="arbitrum">Arbitrum</option>
           </select>
         </label>
-        <label>To Specific
-          <input type="text" name="toSpecific" placeholder="eth, base, arb..." />
-        </label>
-        <label>Action
-          <select name="action">
-            <option value="buy">Buy</option>
-            <option value="sell">Sell</option>
+        <label>To Chain:
+          <select id="toChain">
+            <option value="svm">SVM</option>
+            <option value="evm">EVM</option>
           </select>
         </label>
-        <label>From Token
-          <input type="text" name="fromToken" placeholder="USDC, ETH..." />
+        <label>To Specific:
+          <select id="toSpecific">
+            <option value="eth">ETH</option>
+            <option value="base">BASE</option>
+            <option value="bnb">BNB</option>
+            <option value="btc">BTC</option>
+            <option value="arbitrum">Arbitrum</option>
+          </select>
         </label>
-        <label>To Token
-          <input type="text" name="toToken" placeholder="ETH, SOL..." />
+        <label>Choose:
+          <select id="action">
+            <option value="buy">BUY</option>
+            <option value="sell">SELL</option>
+          </select>
         </label>
-        <label>Amount
-          <input type="number" step="0.01" name="amount" placeholder="10.5" required />
-        </label>
-        <label>Reason
-          <input type="text" name="reason" placeholder="strategy / note" />
-        </label>
-        <button type="submit" class="btn primary">Submit Trade</button>
+        <label>From Token: <input type="text" id="fromToken" required /></label>
+        <label>To Token: <input type="text" id="toToken" required /></label>
+        <label>Amount: <input type="number" id="amount" required /></label>
+        <label>Reason: <input type="text" id="reason" /></label>
+        <button type="submit">Submit Trade</button>
       </form>
-      <pre id="manual-trade-output" class="trades"></pre>
     </section>
 
-```
-<!-- Quick Trade -->
-<section class="card">
-  <h2>Quick Trade</h2>
-  <form id="quick-trade-form" class="form-grid">
-    <label>From
-      <select name="fromAsset">
-        <option>ETH</option><option>BTC</option><option>BNB</option><option>ARB</option><option>SOL</option>
-      </select>
-    </label>
-    <label>To
-      <select name="toAsset">
-        <option>ETH</option><option>BTC</option><option>BNB</option><option>ARB</option><option>SOL</option>
-      </select>
-    </label>
-    <label>Action
-      <select name="action">
-        <option value="buy">Buy</option><option value="sell">Sell</option>
-      </select>
-    </label>
-    <label>Amount
-      <input type="number" step="0.01" name="amount" required />
-    </label>
-    <button type="submit" class="btn primary">Submit</button>
-  </form>
-  <div id="quick-trade-result" class="result-box">Belum ada transaksi.</div>
-</section>
+        <section style="margin-top:12px" class="grid-2">
+          <div class="card">
+            <strong>Market Chart — ETH/USD (mock)</strong>
+            <canvas id="chart" width="800" height="240" style="width:100%;background:linear-gradient(180deg, rgba(6,182,212,0.03), transparent);border-radius:8px;margin-top:8px"></canvas>
+          </div>
 
-<!-- Bridge -->
-<section class="card">
-  <h2>Bridge (Simulate)</h2>
-  <form id="bridge-form" class="form-grid">
-    <label>From
-      <input type="text" name="fromBridge" placeholder="eth, sol..." />
-    </label>
-    <label>To
-      <input type="text" name="toBridge" placeholder="base, arb..." />
-    </label>
-    <label>Token
-      <input type="text" name="token" placeholder="USDC" />
-    </label>
-    <label>Amount
-      <input type="number" name="amount" step="0.01" />
-    </label>
-    <label>Reason
-      <input type="text" name="reason" />
-    </label>
-    <button type="submit" class="btn primary">Submit</button>
-  </form>
-  <div id="bridge-result" class="result-box"></div>
-</section>
+          <div class="card">
+            <strong>Trade History</strong>
+            <div style="margin-top:8px;overflow:auto;max-height:240px">
+              <table>
+                <thead><tr><th>Time</th><th>Pair</th><th>Side</th><th>Amount</th><th>Status</th></tr></thead>
+                <tbody id="historyTbl"></tbody>
+              </table>
+            </div>
+            <div style="margin-top:10px;display:flex;gap:8px;justify-content:flex-end">
+              <button class="btn secondary" id="exportCsv">Export CSV</button>
+            </div>
+          </div>
+        </section>
 
-<!-- Transaksi Sederhana -->
-<section class="card">
-  <h2>Transaksi Sederhana</h2>
-  <form id="tx-form" class="form-grid">
-    <label>Aset <input type="text" id="asset" required /></label>
-    <label>Jumlah <input type="number" id="quantity" step="0.01" required /></label>
-    <label>Harga <input type="number" id="price" step="0.01" required /></label>
-    <label>Aksi
-      <select id="action" required>
-        <option value="buy">Buy</option><option value="sell">Sell</option>
-      </select>
-    </label>
-    <button type="submit" class="btn primary">Submit Transaksi</button>
-  </form>
-  <div id="tx-result"></div>
-</section>
+      </div>
 
-<!-- Portfolio -->
-<section class="card">
-  <h2>Portfolio</h2>
-  <button id="refresh-portfolio" class="btn">Refresh Portfolio</button>
-  <table id="portfolio-table">
-    <thead>
-      <tr><th>Token</th><th>Balance</th><th>Chain</th><th>Last Updated</th></tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-</section>
+      <div style="height:12px"></div>
 
-<!-- Riwayat Transaksi -->
-<section class="card">
-  <h2>Riwayat Transaksi</h2>
-  <table>
-    <thead>
-      <tr><th>ID</th><th>Asset</th><th>Jumlah</th><th>Harga</th><th>Aksi</th><th>Total</th><th>Waktu</th></tr>
-    </thead>
-    <tbody id="riwayat-body"></tbody>
-  </table>
-</section>
+      <div class="card">
+        <header style="display:flex;justify-content:space-between;align-items:center"><strong>Analytics & Notes</strong><div style="color:var(--muted);font-size:13px">PnL | Performance</div></header>
+        <div style="margin-top:10px;display:flex;gap:12px;align-items:center">
+          <div style="flex:1">
+            <div style="font-size:13px;color:var(--muted)">7d Change</div>
+            <div style="font-weight:700;font-size:20px">+4.8%</div>
+          </div>
+          <div style="width:280px">
+            <div style="font-size:13px;color:var(--muted)">Agent Accuracy</div>
+            <div style="font-weight:700">72% (mock)</div>
+          </div>
+          <div style="margin-left:auto;color:var(--muted);font-size:13px">Version: mock-0.1</div>
+        </div>
+      </div>
 
-<!-- Trade History Recall -->
-<section class="card">
-  <h2>Trade History (Recall Competition)</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th><th>Timestamp</th><th>Competition</th>
-        <th>From → To</th><th>Token</th><th>Amount</th><th>Action</th><th>Status</th>
-      </tr>
-    </thead>
-    <tbody id="history-body"></tbody>
-  </table>
-</section>
-```
-
-  </main>
-
-  <footer>
-    <small>Local demo — simulated execution. Integrate with Recall APIs for real trading/competitions.</small>
-  </footer>
-
-  <script src="app.js"></script>
+    </main>
+  </div>
 
   <script>
-    // Dark Mode Toggle
-    const darkToggle = document.getElementById("toggle-dark");
-    darkToggle.addEventListener("click", () => {
-      document.body.classList.toggle("dark");
-      darkToggle.textContent = document.body.classList.contains("dark") ? "☀️ Light Mode" : "🌙 Dark Mode";
-    });
+    // --- Mock data & UI logic ---
+    const portfolio = [{symbol:'ETH', amount:2.4, usd:4400},{symbol:'BTC', amount:0.12, usd:4200},{symbol:'USDC', amount:1800, usd:1800}]
+    const history = []
 
-    // Quick Trade
-    const quickForm = document.getElementById("quick-trade-form");
-    const quickResult = document.getElementById("quick-trade-result");
-    quickForm.addEventListener("submit", e => {
-      e.preventDefault();
-      const payload = Object.fromEntries(new FormData(quickForm).entries());
-      quickResult.textContent = `Trade Submitted: ${JSON.stringify(payload)}`;
-    });
+    const portfolioList = document.getElementById('portfolioList')
+    const totalEquityEl = document.getElementById('totalEquity')
+    const lastUpdate = document.getElementById('lastUpdate')
+    const historyTbl = document.getElementById('historyTbl')
+    const agentLog = document.getElementById('agentLog')
+    const agentDot = document.getElementById('agentDot')
+    const agentMode = document.getElementById('agentMode')
+    const toggleAgent = document.getElementById('toggleAgent')
+    const submitTrade = document.getElementById('submitTrade')
+    const estimateBtn = document.getElementById('estimateBtn')
+    const estimateEl = document.getElementById('estimate')
 
-    // Transaksi Sederhana
-    const txForm = document.getElementById("tx-form");
-    const txResult = document.getElementById("tx-result");
-    const riwayatBody = document.getElementById("riwayat-body");
-
-    async function loadTransactions() {
-      const res = await fetch("/api/transactions");
-      const data = await res.json();
-      riwayatBody.innerHTML = "";
-      data.transactions.forEach(tx => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${tx.id}</td>
-          <td>${tx.asset}</td>
-          <td>${tx.quantity}</td>
-          <td>${tx.price}</td>
-          <td>${tx.action}</td>
-          <td>${tx.total}</td>
-          <td>${new Date(tx.timestamp).toLocaleString()}</td>
-        `;
-        riwayatBody.appendChild(row);
-      });
+    function renderPortfolio(){
+      portfolioList.innerHTML = ''
+      let total = 0
+      portfolio.forEach(p=>{ total += p.usd; const el = document.createElement('div'); el.className='portfolio-item'; el.innerHTML = `<div><strong>${p.symbol}</strong><div style="font-size:12px;color:var(--muted)">${p.amount} ${p.symbol}</div></div><div style="text-align:right">$${p.usd.toLocaleString()}</div>`; portfolioList.appendChild(el) })
+      totalEquityEl.textContent = Math.round(total).toLocaleString()
+      lastUpdate.textContent = new Date().toLocaleString()
     }
 
-    txForm.addEventListener("submit", async e => {
-      e.preventDefault();
-      txResult.textContent = "Mengirim transaksi...";
-      const payload = {
-        asset: document.getElementById("asset").value,
-        quantity: parseFloat(document.getElementById("quantity").value),
-        price: parseFloat(document.getElementById("price").value),
-        action: document.getElementById("action").value
-      };
-      try {
-        const res = await fetch("/api/transaction", {
-          method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-        const data = await res.json();
-        if (data.success) {
-          txResult.textContent = "✅ Transaksi berhasil!";
-          loadTransactions();
-        } else {
-          txResult.textContent = `❌ Gagal: ${data.error}`;
-        }
-      } catch (err) {
-        txResult.textContent = `❌ Error: ${err.message}`;
-      }
-    });
-    loadTransactions();
+    function renderHistory(){
+      historyTbl.innerHTML = ''
+      history.slice().reverse().forEach(tx=>{ const tr = document.createElement('tr'); tr.innerHTML = `<td>${tx.time}</td><td>${tx.pair}</td><td>${tx.side}</td><td>${tx.amount}</td><td>${tx.status}</td>`; historyTbl.appendChild(tr) })
+    }
 
-    // Manual Trade
-    const manualForm = document.getElementById("manual-trade-form");
-    const manualOutput = document.getElementById("manual-trade-output");
-    manualForm.addEventListener("submit", async e => {
-      e.preventDefault();
-      const payload = Object.fromEntries(new FormData(manualForm).entries());
-      try {
-        const res = await fetch("/manual-trade", {
-          method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-        const data = await res.json();
-        manualOutput.textContent = JSON.stringify(data, null, 2);
+    function pushLog(text){ const now = new Date().toLocaleTimeString(); agentLog.innerHTML = `<div style="margin-bottom:6px">[${now}] ${text}</div>` + agentLog.innerHTML }
 
-        const historyBody = document.getElementById("history-body");
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${data.id || "-"}</td>
-          <td>${new Date().toLocaleString()}</td>
-          <td>${payload.competitionId || "-"}</td>
-          <td>${payload.fromSpecific} → ${payload.toSpecific}</td>
-          <td>${payload.fromToken}/${payload.toToken}</td>
-          <td>${payload.amount}</td>
-          <td>${payload.action}</td>
-          <td>${data.success ? "✅ success" : "❌ failed"}</td>
-        `;
-        historyBody.appendChild(row);
-      } catch (err) {
-        manualOutput.textContent = "Error: " + err.message;
-      }
-    });
+    // Chart (simple line)
+    const c = document.getElementById('chart'); const ctx = c.getContext('2d');
+    let data = Array.from({length:60},(_,i)=>4000 + Math.sin(i/5)*80 + Math.random()*40)
+    function drawChart(){ ctx.clearRect(0,0,c.width,c.height); ctx.beginPath(); const min = Math.min(...data); const max = Math.max(...data); data.forEach((v,i)=>{ const x = (i/data.length)*c.width; const y = c.height - ( (v-min)/(max-min) * c.height ); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y) }); ctx.strokeStyle='rgba(6,182,212,0.95)'; ctx.lineWidth=2; ctx.stroke(); }
+    drawChart()
+    setInterval(()=>{ data.shift(); data.push(data[data.length-1] + (Math.random()-0.4)*30); drawChart() }, 2000)
+
+    // Actions
+    estimateBtn.onclick = ()=>{ const amt = parseFloat(document.getElementById('amount').value||1); const from = document.getElementById('fromToken').value; const to = document.getElementById('toToken').value; estimateEl.textContent = `${(amt* (Math.random()*0.98 + 0.9)).toFixed(4)} ${to}`; pushLog(`Estimate for ${amt} ${from} → ${to}`) }
+
+    submitTrade.onclick = ()=>{
+      const amt = parseFloat(document.getElementById('amount').value||1);
+      const from = document.getElementById('fromToken').value;
+      const to = document.getElementById('toToken').value;
+      const side = document.getElementById('side').value
+      const pair = `${from}/${to}`
+      const tx = {time:new Date().toLocaleString(),pair,side,amount:amt,status:'Pending'}
+      history.push(tx); renderHistory(); pushLog(`Submitted ${side} ${amt} ${pair}`)
+      // simulate confirmation
+      setTimeout(()=>{ tx.status='Confirmed'; renderHistory(); pushLog(`Tx confirmed: ${side} ${amt} ${pair}`) }, 1500)
+    }
+
+    // Agent simulation
+    let agentRunning = false
+    toggleAgent.onclick = ()=>{
+      agentRunning = !agentRunning
+      if(agentRunning){ agentDot.className='dot green'; agentMode.textContent='Running'; toggleAgent.textContent='Stop Auto'; pushLog('Agent started (Auto)') }
+      else{ agentDot.className='dot gray'; agentMode.textContent='Idle'; toggleAgent.textContent='Start Auto'; pushLog('Agent stopped') }
+    }
+
+    document.getElementById('runSignal').onclick = ()=>{
+      pushLog('Agent found signal: potential arbitrage ETH/USDC. Preparing order...');
+      setTimeout(()=>{ document.getElementById('amount').value = (Math.random()*1.5+0.1).toFixed(4); document.getElementById('side').value='buy'; submitTrade.click() }, 900)
+    }
+
+    // Export CSV
+    document.getElementById('exportCsv').onclick = ()=>{
+      const rows = [['Time','Pair','Side','Amount','Status'],...history.map(h=>[h.time,h.pair,h.side,h.amount,h.status])]
+      const csv = rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n')
+      const blob = new Blob([csv],{type:'text/csv'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download='trade-history.csv'; a.click(); URL.revokeObjectURL(url)
+    }
+
+    // Simple nav
+    document.querySelectorAll('.nav button').forEach(btn=> btn.onclick = ()=>{ document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); })
+
+    // initial render
+    renderPortfolio(); renderHistory(); pushLog('UI ready — mock data loaded')
   </script>
-
 </body>
 </html>

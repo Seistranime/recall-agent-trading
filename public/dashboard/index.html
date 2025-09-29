@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Recall Agent Trading — Dashboard (Standalone)</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="navbar">
+    <h1>Recall Dashboard</h1>
+    <div>
+      <button id="toggle-dark" class="btn">🌙 Dark</button>
+      <button id="refresh-all" class="btn">🔄 Refresh</button>
+    </div>
+  </header>
+
+  <main class="grid">
+    <section class="card" id="portfolio-card">
+      <h2>Portfolio</h2>
+      <div id="portfolio-loading" class="muted">Memuat...</div>
+      <table id="portfolio-table" class="compact hidden">
+        <thead><tr><th>Token</th><th>Balance</th><th>Chain</th><th>Last Updated</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section class="card" id="trades-card">
+      <h2>Trade History</h2>
+      <div id="trades-loading" class="muted">Memuat...</div>
+      <table id="trades-table" class="compact hidden">
+        <thead><tr><th>ID</th><th>Timestamp</th><th>From → To</th><th>Token</th><th>Amount</th><th>Action</th><th>Status</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section class="card" id="transactions-card">
+      <h2>Transaksi Sederhana</h2>
+      <form id="tx-form" class="form-grid">
+        <label>Aset <input id="asset" required /></label>
+        <label>Jumlah <input id="quantity" type="number" step="0.01" required /></label>
+        <label>Harga <input id="price" type="number" step="0.01" required /></label>
+        <label>Aksi
+          <select id="action">
+            <option value="buy">Buy</option>
+            <option value="sell">Sell</option>
+          </select>
+        </label>
+        <button class="btn primary" type="submit">Kirim</button>
+      </form>
+      <div id="tx-result" class="muted"></div>
+      <div id="tx-list" class="muted">Tidak ada transaksi.</div>
+    </section>
+
+    <section class="card" id="manual-card">
+      <h2>Manual Trade</h2>
+      <form id="manual-trade-form" class="form-grid">
+        <label>From Specific <input name="fromSpecific" placeholder="eth, sol" /></label>
+        <label>To Specific <input name="toSpecific" placeholder="eth, base" /></label>
+        <label>Action
+          <select name="action"><option value="buy">Buy</option><option value="sell">Sell</option></select>
+        </label>
+        <label>From Token <input name="fromToken" /></label>
+        <label>To Token <input name="toToken" /></label>
+        <label>Amount <input type="number" step="0.01" name="amount" required /></label>
+        <label>Reason <input name="reason" /></label>
+        <button class="btn primary" type="submit">Submit Trade</button>
+      </form>
+      <pre id="manual-output" class="trades muted"></pre>
+    </section>
+
+    <section class="card" id="bridge-card">
+      <h2>Bridge (Simulate)</h2>
+      <form id="bridge-form" class="form-grid">
+        <label>From Specific <input name="fromSpecific" placeholder="eth, sol..." /></label>
+        <label>To Specific <input name="toSpecific" placeholder="base, arb..." /></label>
+        <label>Token <input name="token" placeholder="USDC" /></label>
+        <label>Amount <input type="number" step="0.01" name="amount" /></label>
+        <label>Reason <input name="reason" /></label>
+        <button class="btn primary" type="submit">Submit Bridge</button>
+      </form>
+      <div id="bridge-result" class="muted"></div>
+    </section>
+
+    <section class="card" id="competitions-card">
+      <h2>Competitions</h2>
+      <div id="competitions-loading" class="muted">Memuat...</div>
+      <div id="competitions-list" class="muted"></div>
+    </section>
+  </main>
+
+  <footer class="footer">Standalone dashboard — fallback to local sample data when backend is unavailable.</footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
