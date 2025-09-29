@@ -1,11 +1,15 @@
+
 // -------------------------
 // File: src/App.js
 // -------------------------
 import React, { useEffect, useState } from "react";
 
+const API_BASE = ""; // kosong = backend sama domain, contoh: http://localhost:5000
+
 function App() {
   const [portfolio, setPortfolio] = useState([]);
   const [trades, setTrades] = useState([]);
+  const [msg, setMsg] = useState("");
   const [tradeForm, setTradeForm] = useState({
     fromChainType: "evm",
     fromSpecific: "",
@@ -24,12 +28,13 @@ function App() {
     amount: "",
     reason: "",
   });
-  const [msg, setMsg] = useState("");
 
-  // Load portfolio & trades
+  // -------------------------
+  // Load Portfolio & Trades
+  // -------------------------
   const refreshPortfolio = async () => {
     try {
-      const res = await fetch("/api/portfolio");
+      const res = await fetch(`${API_BASE}/api/portfolio`);
       const body = await res.json();
       if (body.ok) setPortfolio(body.portfolio || body.assets || []);
     } catch (err) {
@@ -39,7 +44,7 @@ function App() {
 
   const refreshTrades = async () => {
     try {
-      const res = await fetch("/api/trades");
+      const res = await fetch(`${API_BASE}/api/trades`);
       const body = await res.json();
       if (body.ok) setTrades(body.trades || []);
     } catch (err) {
@@ -52,11 +57,13 @@ function App() {
     refreshTrades();
   }, []);
 
-  // Handle trade form submit
+  // -------------------------
+  // Trade Form Submit
+  // -------------------------
   const submitTrade = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("/api/trade", {
+      const res = await fetch(`${API_BASE}/api/trade`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(tradeForm),
@@ -85,7 +92,9 @@ function App() {
     }
   };
 
-  // Handle bridge form submit
+  // -------------------------
+  // Bridge Form Submit
+  // -------------------------
   const submitBridge = async (e) => {
     e.preventDefault();
     try {
@@ -98,7 +107,7 @@ function App() {
         amount: bridgeForm.amount,
         reason: bridgeForm.reason,
       };
-      const res = await fetch("/api/bridge", {
+      const res = await fetch(`${API_BASE}/api/bridge`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -106,7 +115,13 @@ function App() {
       const data = await res.json();
       if (data.ok) {
         setMsg(`✅ Bridge completed: ${data.bridge.id}`);
-        setBridgeForm({ fromSpecific: "", toSpecific: "", token: "", amount: "", reason: "" });
+        setBridgeForm({
+          fromSpecific: "",
+          toSpecific: "",
+          token: "",
+          amount: "",
+          reason: "",
+        });
         refreshPortfolio();
         refreshTrades();
       } else {
@@ -117,11 +132,30 @@ function App() {
     }
   };
 
+  // -------------------------
+  // Manual Trade with Recall API
+  // -------------------------
+  const submitManualTrade = async (formData) => {
+    const resp = await fetch(`${API_BASE}/manual-trade`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    });
+    return resp.json();
+  };
+
+  const fetchHistory = async () => {
+    const resp = await fetch(`${API_BASE}/manual-trades`);
+    return resp.json();
+  };
+
+  // -------------------------
+  // UI
+  // -------------------------
   return (
     <div className="p-6 space-y-6">
       <h1 className="text-2xl font-bold">📊 Recall Agent Trading Dashboard</h1>
 
-      {/* Message */}
       {msg && <div className="p-2 bg-yellow-100 rounded">{msg}</div>}
 
       {/* Trade Form */}
@@ -132,36 +166,48 @@ function App() {
             <input
               placeholder="From Specific"
               value={tradeForm.fromSpecific}
-              onChange={(e) => setTradeForm({ ...tradeForm, fromSpecific: e.target.value })}
+              onChange={(e) =>
+                setTradeForm({ ...tradeForm, fromSpecific: e.target.value })
+              }
               className="border p-2 rounded"
             />
             <input
               placeholder="To Specific"
               value={tradeForm.toSpecific}
-              onChange={(e) => setTradeForm({ ...tradeForm, toSpecific: e.target.value })}
+              onChange={(e) =>
+                setTradeForm({ ...tradeForm, toSpecific: e.target.value })
+              }
               className="border p-2 rounded"
             />
             <input
               placeholder="From Token"
               value={tradeForm.fromToken}
-              onChange={(e) => setTradeForm({ ...tradeForm, fromToken: e.target.value })}
+              onChange={(e) =>
+                setTradeForm({ ...tradeForm, fromToken: e.target.value })
+              }
               className="border p-2 rounded"
             />
             <input
               placeholder="To Token"
               value={tradeForm.toToken}
-              onChange={(e) => setTradeForm({ ...tradeForm, toToken: e.target.value })}
+              onChange={(e) =>
+                setTradeForm({ ...tradeForm, toToken: e.target.value })
+              }
               className="border p-2 rounded"
             />
             <input
               placeholder="Amount"
               value={tradeForm.amount}
-              onChange={(e) => setTradeForm({ ...tradeForm, amount: e.target.value })}
+              onChange={(e) =>
+                setTradeForm({ ...tradeForm, amount: e.target.value })
+              }
               className="border p-2 rounded"
             />
             <select
               value={tradeForm.action}
-              onChange={(e) => setTradeForm({ ...tradeForm, action: e.target.value })}
+              onChange={(e) =>
+                setTradeForm({ ...tradeForm, action: e.target.value })
+              }
               className="border p-2 rounded"
             >
               <option value="buy">Buy</option>
@@ -171,10 +217,15 @@ function App() {
           <input
             placeholder="Reason"
             value={tradeForm.reason}
-            onChange={(e) => setTradeForm({ ...tradeForm, reason: e.target.value })}
+            onChange={(e) =>
+              setTradeForm({ ...tradeForm, reason: e.target.value })
+            }
             className="border p-2 rounded"
           />
-          <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
+          <button
+            type="submit"
+            className="bg-blue-500 text-white px-4 py-2 rounded"
+          >
             Submit Trade
           </button>
         </form>
@@ -188,45 +239,61 @@ function App() {
             <input
               placeholder="From Specific"
               value={bridgeForm.fromSpecific}
-              onChange={(e) => setBridgeForm({ ...bridgeForm, fromSpecific: e.target.value })}
+              onChange={(e) =>
+                setBridgeForm({ ...bridgeForm, fromSpecific: e.target.value })
+              }
               className="border p-2 rounded"
             />
             <input
               placeholder="To Specific"
               value={bridgeForm.toSpecific}
-              onChange={(e) => setBridgeForm({ ...bridgeForm, toSpecific: e.target.value })}
+              onChange={(e) =>
+                setBridgeForm({ ...bridgeForm, toSpecific: e.target.value })
+              }
               className="border p-2 rounded"
             />
             <input
               placeholder="Token"
               value={bridgeForm.token}
-              onChange={(e) => setBridgeForm({ ...bridgeForm, token: e.target.value })}
+              onChange={(e) =>
+                setBridgeForm({ ...bridgeForm, token: e.target.value })
+              }
               className="border p-2 rounded"
             />
             <input
               placeholder="Amount"
               value={bridgeForm.amount}
-              onChange={(e) => setBridgeForm({ ...bridgeForm, amount: e.target.value })}
+              onChange={(e) =>
+                setBridgeForm({ ...bridgeForm, amount: e.target.value })
+              }
               className="border p-2 rounded"
             />
           </div>
           <input
             placeholder="Reason"
             value={bridgeForm.reason}
-            onChange={(e) => setBridgeForm({ ...bridgeForm, reason: e.target.value })}
+            onChange={(e) =>
+              setBridgeForm({ ...bridgeForm, reason: e.target.value })
+            }
             className="border p-2 rounded"
           />
-          <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded">
+          <button
+            type="submit"
+            className="bg-green-500 text-white px-4 py-2 rounded"
+          >
             Submit Bridge
           </button>
         </form>
       </div>
 
-      {/* Portfolio Table */}
+      {/* Portfolio */}
       <div className="bg-white shadow rounded p-4">
         <div className="flex justify-between items-center mb-2">
           <h2 className="text-lg font-semibold">Portfolio</h2>
-          <button onClick={refreshPortfolio} className="bg-gray-200 px-3 py-1 rounded">
+          <button
+            onClick={refreshPortfolio}
+            className="bg-gray-200 px-3 py-1 rounded"
+          >
             Refresh
           </button>
         </div>
@@ -246,9 +313,13 @@ function App() {
               {portfolio.map((row, idx) => (
                 <tr key={idx} className="hover:bg-gray-50">
                   <td className="border px-2 py-1">{row.token || row.symbol}</td>
-                  <td className="border px-2 py-1 text-right">{row.balance || row.amount}</td>
+                  <td className="border px-2 py-1 text-right">
+                    {row.balance || row.amount}
+                  </td>
                   <td className="border px-2 py-1">{row.chain || ""}</td>
-                  <td className="border px-2 py-1">{row.lastUpdated || ""}</td>
+                  <td className="border px-2 py-1">
+                    {row.lastUpdated || ""}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -267,5 +338,5 @@ function App() {
   );
 }
 
-
 export default App;
+

@@ -1,5 +1,6 @@
 
 /* style.css - Recall Agent Trading Dashboard */
+
 /* Reset & base */
 :root { 
   font-family: Inter, system-ui, Arial, sans-serif; 
@@ -8,11 +9,11 @@
 }
 * { box-sizing: border-box; margin:0; padding:0; }
 
-/* Layout utama */
+/* Body & layout */
 body {
-  margin: 0;
-  padding: 20px;
-  background: #f4f4f4;
+  margin: 20px;
+  padding: 0;
+  background-color: #f9f9f9;
   font-family: Inter, system-ui, Arial, sans-serif;
 }
 
@@ -26,11 +27,19 @@ body {
 }
 
 /* Header */
+header {
+  text-align: center;
+  margin-bottom: 30px;
+}
 header h1 { 
   margin: 0 0 16px; 
   font-size: 22px; 
   color:#0f172a;
 }
+
+/* Headings */
+h1 { color: #333; }
+h2 { margin-top: 30px; color: #444; }
 
 /* Cards & sections */
 .forms { 
@@ -61,6 +70,7 @@ label {
   color:#374151;
   display:flex;
   flex-direction:column;
+  margin-bottom: 10px;
 }
 
 /* Inputs */
@@ -70,6 +80,7 @@ input, select {
   border-radius:8px; 
   border:1px solid #e5e7eb; 
   font-size:14px;
+  margin-left: 10px;
 }
 
 /* Forms */
@@ -82,27 +93,30 @@ form {
 /* Buttons */
 .actions { margin-top:8px; }
 button { 
-  padding:10px 14px; 
+  padding:10px 16px; 
   border-radius:8px; 
   background:#0ea5a0; 
   color:white; 
   border:none; 
   cursor:pointer; 
   transition: background 0.2s, filter 0.2s;
+  margin-top: 10px;
 }
 button:hover { 
   filter:brightness(0.95); 
-  background:#0078d7;
+  background:#0d47a1;
 }
 
 /* Results */
-.result, #result { 
-  margin-top:8px; 
+.result, #result, #trade-result { 
+  margin-top:15px; 
   font-size:13px; 
   color:#065f46; 
   background: #eef; 
   padding: 10px; 
   border-radius: 5px;
+  border: 1px solid #99c;
+  min-height: 30px;
 }
 
 /* Portfolio & tables */
@@ -110,7 +124,7 @@ button:hover {
 table { 
   width:100%; 
   border-collapse:collapse; 
-  margin-top:8px; 
+  margin-top:15px; 
   background: #fff; 
 }
 th, td { 
@@ -123,6 +137,9 @@ th {
   background:#f1f5f9; 
   color:#374151; 
   text-align:left;
+}
+table tbody tr:nth-child(even) {
+  background-color: #f2f2f2;
 }
 
 /* Trades log */
